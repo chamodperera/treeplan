@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="TaskPaneApp">
+  <Id>7c1f0b52-3a4e-4d6a-9b8e-5f2d1a6c9e01</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>TreePlan Web</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="TreePlan"/>
+  <Description DefaultValue="Decision tree builder for Excel (web rebuild of BYTreePlan)."/>
+  <IconUrl DefaultValue="https://YOUR-USERNAME.github.io/treeplan/icon.png"/>
+  <SupportUrl DefaultValue="https://YOUR-USERNAME.github.io/treeplan/"/>
+  <AppDomains><AppDomain>https://YOUR-USERNAME.github.io</AppDomain></AppDomains>
+  <Hosts><Host Name="Workbook"/></Hosts>
+  <Requirements><Sets><Set Name="ExcelApi" MinVersion="1.9"/></Sets></Requirements>
+  <DefaultSettings><SourceLocation DefaultValue="https://YOUR-USERNAME.github.io/treeplan/index.html"/></DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>
