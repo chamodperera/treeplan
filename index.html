@@ -18,7 +18,7 @@ Theme: <select id="th" onchange="opt()"><option>Colorful</option><option>Simplif
 <p style="color:#666">Click a node (■ decision, ● event, ▶ terminal) or its value in the sheet to select it. Edit labels, payoffs and probabilities directly in the cells; they are kept when the tree is redrawn.</p>
 <script>
 let T=null,clip=null,busy=false;
-const TH={Colorful:{D:'#2e75b6',E:'#c55a11',T:'#548235'},Simplified:{D:'#000',E:'#000',T:'#000'},Traditional:{D:'#c00000',E:'#1f3864',T:'#7f7f7f'}},SY={D:'■',E:'●',T:'▶'};
+const TH={Colorful:{D:'#2e75b6',E:'#c55a11',T:'#548235'},Simplified:{D:'#000000',E:'#000000',T:'#000000'},Traditional:{D:'#c00000',E:'#1f3864',T:'#7f7f7f'}},SY={D:'■',E:'●',T:'▶'};
 const kids=id=>T.nodes.filter(n=>n.p===id),byId=id=>T.nodes.find(n=>n.id===id),root=()=>T.nodes.find(n=>n.p<0),R=(r,c)=>`R${r+1}C${c+1}`;
 const mk=(p,t,l)=>{const n={id:T.next++,p,t,l:l||'',pay:0,pr:0};T.nodes.push(n);return n};
 const desc=id=>kids(id).flatMap(k=>[k.id,...desc(k.id)]),rm=ids=>T.nodes=T.nodes.filter(n=>!ids.includes(n.id));
@@ -41,11 +41,11 @@ async function render(ctx){const ws=ctx.workbook.worksheets.getItem(T.sheet),p=l
   else f='=IF(ABS(1-SUM('+k.map(pr).join(',')+'))<=0.00001,SUM('+k.map(m=>pr(m)+'*'+vl(m)).join(',')+'),NA())';
   const mkc=ws.getRangeByIndexes(q.r,q.x+1,1,1),vc=ws.getRangeByIndexes(q.r,q.x+2,1,1);
   mkc.values=[[SY[n.t]]];mkc.format.font.color=th[n.t];mkc.format.font.bold=true;mkc.format.horizontalAlignment='Center';
-  vc.formulasR1C1=[[f]];vc.numberFormat=[['#,##0.00']];vc.format.font.color=th[n.t];vc.format.font.bold=true;
+  vc.formulasR1C1=[[f]];vc.numberFormat=[['#,##0.00']];vc.format.font.color=th[n.t];vc.format.font.bold=true;if(n.t!=='T')vc.format.fill.color='#FFFF00';
   if(n.p>=0){ws.getRangeByIndexes(q.r-1,q.x,1,1).values=[[n.l]];const pc=ws.getRangeByIndexes(q.r,q.x,1,1);pc.values=[[n.pay]];pc.numberFormat=[['#,##0.00']];
    if(byId(n.p).t==='E'){const e=ws.getRangeByIndexes(q.r+1,q.x,1,1);e.values=[[n.pr]];e.numberFormat=[['0.0%']];e.format.font.color='#7f7f7f'}}
   });
- const bd=(r,c,h,w,e)=>{const b=ws.getRangeByIndexes(r,c,h,w).format.borders.getItem(e);b.style='Continuous';b.color='#444';b.weight='Medium'};
+ const bd=(r,c,h,w,e)=>{const b=ws.getRangeByIndexes(r,c,h,w).format.borders.getItem(e);b.style='Continuous';b.color='#444444';b.weight='Medium'};
  T.nodes.forEach(n=>{if(n.p<0)return;const a=p[n.p],q=p[n.id];
   bd(a.r,a.x+2,1,2,'EdgeBottom');          /* stub right of the parent value */
   bd(q.r,q.x,1,1,'EdgeBottom');            /* line under the branch label */
