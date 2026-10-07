@@ -28,7 +28,8 @@ function layout(){let leaf=0,pos={};(function go(n,d){const k=kids(n.id);let r;i
 function S(){const n=T&&T.sel!=null&&byId(T.sel);if(!n)throw Error('Click a node in the sheet first.');return n}
 function eqProb(p){const k=kids(p);k.forEach(c=>c.pr=1/k.length)}
 async function clearOld(ctx){if(!T)return;const ws=ctx.workbook.worksheets.getItem(T.sheet),p=layout();let mr=0,mc=0;for(const k in p){mr=Math.max(mr,p[k].r);mc=Math.max(mc,p[k].x)}
- ws.getRangeByIndexes(T.r0,T.c0,mr+3-T.r0,mc+4-T.c0).clear();ws.shapes.load('items/name');await ctx.sync();ws.shapes.items.filter(s=>s.name.startsWith('tp_')).forEach(s=>s.delete());await ctx.sync()}
+ ws.getRangeByIndexes(T.r0,T.c0,mr+3-T.r0,mc+4-T.c0).clear();await ctx.sync();
+ try{ws.shapes.load('items/name');await ctx.sync();ws.shapes.items.filter(s=>s.name.startsWith('tp_')).forEach(s=>s.delete());await ctx.sync()}catch(e){}}
 async function pull(ctx){const ws=ctx.workbook.worksheets.getItem(T.sheet),p=layout(),rs={};
  T.nodes.forEach(n=>{if(n.p>=0){const q=p[n.id];rs[n.id]=ws.getRangeByIndexes(q.r-1,q.x,3,1).load('values')}});await ctx.sync();
  T.nodes.forEach(n=>{const g=rs[n.id];if(g){const v=g.values;n.l=String(v[0][0]);n.pay=v[1][0]===''?0:v[1][0];n.pr=v[2][0]===''?0:v[2][0]}})}
@@ -43,10 +44,13 @@ async function render(ctx){const ws=ctx.workbook.worksheets.getItem(T.sheet),p=l
   vc.formulasR1C1=[[f]];vc.numberFormat=[['#,##0.00']];vc.format.font.color=th[n.t];vc.format.font.bold=true;
   if(n.p>=0){ws.getRangeByIndexes(q.r-1,q.x,1,1).values=[[n.l]];const pc=ws.getRangeByIndexes(q.r,q.x,1,1);pc.values=[[n.pay]];pc.numberFormat=[['#,##0.00']];
    if(byId(n.p).t==='E'){const e=ws.getRangeByIndexes(q.r+1,q.x,1,1);e.values=[[n.pr]];e.numberFormat=[['0.0%']];e.format.font.color='#7f7f7f'}}
-  g[n.id]={v:ws.getRangeByIndexes(q.r,q.x+2,1,1).load('left,width,top,height'),e:ws.getRangeByIndexes(q.r,q.x,1,1).load('left,width')}});
- await ctx.sync();let i=0;
- T.nodes.forEach(n=>{if(n.p<0)return;const a=g[n.p],b=g[n.id],x1=a.v.left+a.v.width,y1=a.v.top+a.v.height,x2=b.e.left+b.e.width,y2=b.v.top+b.v.height,mx=(x1+b.e.left)/2;
-  [[x1,y1,mx,y1],[mx,y1,mx,y2],[mx,y2,x2,y2]].filter(l=>l[0]!==l[2]||l[1]!==l[3]).forEach(l=>{const s=ws.shapes.addLine(l[0],l[1],l[2],l[3]);s.name='tp_'+i++;s.lineFormat.color='#444'})});
+  });
+ const bd=(r,c,h,w,e)=>{const b=ws.getRangeByIndexes(r,c,h,w).format.borders.getItem(e);b.style='Continuous';b.color='#444';b.weight='Medium'};
+ T.nodes.forEach(n=>{if(n.p<0)return;const a=p[n.p],q=p[n.id];
+  bd(a.r,a.x+2,1,2,'EdgeBottom');          /* stub right of the parent value */
+  bd(q.r,q.x,1,1,'EdgeBottom');            /* line under the branch label */
+  const lo=Math.min(a.r,q.r),hi=Math.max(a.r,q.r);
+  if(hi>lo)bd(lo+1,a.x+3,hi-lo,1,'EdgeRight')}); /* vertical joint */
  await ctx.sync();save();show()}
 async function op(fn){if(busy)return;busy=true;msg();try{await Excel.run(fn)}catch(e){msg(e.message)}busy=false}
 const mut=f=>op(async ctx=>{if(!T)throw Error('Create a tree first.');await pull(ctx);await clearOld(ctx);f();await render(ctx)});
